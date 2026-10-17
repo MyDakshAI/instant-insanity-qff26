@@ -1,0 +1,11 @@
+# Same as the challenge's requirements.txt; nothing extra is needed.
+# Python 3.10 to 3.12. Verified with qiskit 2.6 and qiskit-aer 0.17.
+qiskit>=1.3,<3
+qiskit-aer>=0.15
+qbraid[qiskit,braket]>=0.12,<0.14
+numpy
+scipy
+matplotlib
+networkx
+pylatexenc
+jupyterlab
