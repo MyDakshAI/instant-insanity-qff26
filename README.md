@@ -50,17 +50,25 @@ many chosen pairs show colour `k`. It is zero exactly for a solved tower.
 
 | Puzzle (N cubes) | Encoding | Device | Qubits | Two-qubit gates | Depth | Shots | P(correct tower) | Random-guess baseline | qBraid job ID |
 |---|---|---|---|---|---|---|---|---|---|
-| 4 | compact 3N, p=12 | aws:aws:sim:sv1 | 12 | 4704 | 4361 | 2000 | 44.62% | 0.1465% | `aws:aws:sim:sv1-0f30-qjob-6ad3893538127b44c71b9b8b` |
+| 4 | compact 3N, p=12 | aws:aws:sim:sv1 | 12 | 4704 | 4361 | 2000 | **44.20%** (measured) | 0.1465% | `aws:aws:sim:sv1-0f30-qjob-6ad3893538127b44c71b9b8b` |
 | 5 | compact 3N, p=10 | local Aer | 15 | 7620 | 6538 | 2000 | 13.37% (exact) | 0.0366% | n/a (local) |
 | 6 | compact 3N, p=10 | local Aer | 18 | 10780 | 7803 | 2000 | 8.43% (exact) | 0.0069% | n/a (local) |
+| 7 | compact 3N, p=8 | local Aer | 21 | 11440 | 9366 | 2000 | 1.04% (exact) | 0.0002% | n/a (local) |
 
 Two-qubit gates and depth are counted after
 `transpile(qc, basis_gates=["rz", "sx", "x", "cx"], optimization_level=1)`.
 P(correct tower) is the fraction of shots that decode to a tower accepted by the
 **starter notebook's own `solves()`**, not merely a low energy.
 
-**On the four-cube puzzle: 44.6% against a 0.146%
-random-guess baseline, a 305x lift.**
+**On the four-cube puzzle, measured on AWS SV1: 884/2000 shots =
+44.20% against a 0.146% random-guess baseline,
+a 302x lift.**
+
+The exact statevector predicted 44.62% for the same circuit. The measured
+44.20% sits 0.4 standard errors away
+(1 s.e. = 1.11% at 2000 shots), so the circuit that actually ran on
+SV1 — transpiled, with a marker qubit, decoded from counts — behaves as the model says.
+That agreement is the end-to-end check on the whole pipeline, not just the maths.
 
 ### Scaling with N
 
@@ -69,6 +77,7 @@ random-guess baseline, a 305x lift.**
 | 4 | 12 | 141 | 460 (1216) | 6 of 4,096 | 1.46e-03 | 12 | 44.616% | 305x |
 | 5 | 15 | 262 | 890 (2288) | 12 of 32,768 | 3.66e-04 | 10 | 13.374% | 365x |
 | 6 | 18 | 370 | 1264 (3120) | 18 of 262,144 | 6.87e-05 | 10 | 8.425% | 1227x |
+| 7 | 21 | 487 | 1686 (4352) | 4 of 2,097,152 | 1.91e-06 | 8 | 1.041% | 5457x |
 
 Every puzzle here has **exactly one tower**. The "zero-cost bitstrings" column is
 larger than one because the searched alias map gives some choices more than one
@@ -76,7 +85,7 @@ of the eight states, so one tower can be spelled several ways. The baseline is
 measured from that column, not assumed, which is why it differs per N.
 
 Puzzles with N > 4 come from the starter's `make_puzzle(n, seed)` with the seeds
-it states give exactly one tower: N=5 seed 16, N=6 seed 86.
+it states give exactly one tower: N=5 seed 16, N=6 seed 86, N=7 seed 68.
 Every N was re-verified against the classical cost before any angle search, and
 the alias map was re-searched per puzzle.
 
