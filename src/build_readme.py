@@ -9,8 +9,9 @@ SEEDS = {5: 16, 6: 86, 7: 68}   # the starter's own seeds, from puzzle.BONUS
 
 # The SV1 job behind the N=4 row. Printed by the submission cell in solution.ipynb.
 SV1_JOB_ID = "aws:aws:sim:sv1-0f30-qjob-6ad3893538127b44c71b9b8b"
-# Shots that decoded to a solved tower on SV1, out of 2000. Set once the job returns.
-SV1_MEASURED = None
+# Shots that decoded to a solved tower on SV1, out of 2000.
+SV1_MEASURED = 884
+SV1_SHOTS = 2000
 
 rows = []
 for r in R:
@@ -84,8 +85,15 @@ Two-qubit gates and depth are counted after
 P(correct tower) is the fraction of shots that decode to a tower accepted by the
 **starter notebook's own `solves()`**, not merely a low energy.
 
-**On the four-cube puzzle: {four['p_solved']:.1%} against a {four['baseline']:.3%}
-random-guess baseline, a {four['lift']:.0f}x lift.**
+**On the four-cube puzzle, measured on AWS SV1: {SV1_MEASURED}/{SV1_SHOTS} shots =
+{SV1_MEASURED / SV1_SHOTS:.2%} against a {four['baseline']:.3%} random-guess baseline,
+a {(SV1_MEASURED / SV1_SHOTS) / four['baseline']:.0f}x lift.**
+
+The exact statevector predicted {four['p_solved']:.2%} for the same circuit. The measured
+{SV1_MEASURED / SV1_SHOTS:.2%} sits {abs(SV1_MEASURED / SV1_SHOTS - four['p_solved']) / ((four['p_solved'] * (1 - four['p_solved']) / SV1_SHOTS) ** 0.5):.1f} standard errors away
+(1 s.e. = {((four['p_solved'] * (1 - four['p_solved']) / SV1_SHOTS) ** 0.5):.2%} at {SV1_SHOTS} shots), so the circuit that actually ran on
+SV1 — transpiled, with a marker qubit, decoded from counts — behaves as the model says.
+That agreement is the end-to-end check on the whole pipeline, not just the maths.
 
 ### Scaling with N
 

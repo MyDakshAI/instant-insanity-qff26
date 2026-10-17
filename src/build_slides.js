@@ -5,6 +5,8 @@ const { applyTheme } = require("/root/.claude/skills/synced/6ab231db-ae75-468a-8
 
 const R = JSON.parse(fs.readFileSync("results/bonus.json", "utf8"));
 const four = R.find((r) => r.n === 4);
+const SV1_MEASURED = 884, SV1_SHOTS = 2000;   // the AWS SV1 job in README.md
+const sv1 = SV1_MEASURED / SV1_SHOTS;
 const pct = (x, d = 1) => (100 * x).toFixed(d) + "%";
 
 const THEME = {
@@ -97,8 +99,8 @@ let s = pres.addSlide({ masterName: "DARK", sectionTitle: "Opening" });
 motif(s, 0.9, 1.75, 0.3, 0.12);
 s.addText("Instant Insanity on 12 qubits", { placeholder: "title" });
 s.addText(
-  [{ text: "Half the qubits, no penalty terms, and a " + pct(four.p_solved, 0) +
-      " hit rate against a " + (100 * four.baseline).toFixed(3) + "% random baseline.",
+  [{ text: "Half the qubits, no penalty terms, and a " + pct(sv1, 0) +
+      " hit rate on AWS SV1 against a " + (100 * four.baseline).toFixed(3) + "% random baseline.",
     options: { breakLine: true } },
    { text: "Daksh Goswami  ·  Rueben  ·  Ishal",
     options: { fontSize: 14, color: "FFFFFF", breakLine: true } },
@@ -259,7 +261,9 @@ const rows = [[
   { text: "Lift", options: { bold: true } }]];
 R.forEach((r) => rows.push([
   String(r.n), String(r.qubits), String(r.cx_per_layer), String(r.best_p),
-  pct(r.p_solved, 2), (100 * r.baseline).toFixed(4) + "%", "×" + Math.round(r.lift)]));
+  r.n === 4 ? pct(sv1, 2) : pct(r.p_solved, 2),
+  (100 * r.baseline).toFixed(4) + "%",
+  "×" + Math.round((r.n === 4 ? sv1 : r.p_solved) / r.baseline)]));
 s.addTable(rows, {
   x: 0.75, y: 1.45, w: 6.1, colW: [0.5, 0.8, 1.0, 0.45, 1.2, 1.2, 0.95],
   fontSize: 12, color: THEME.colors.dk1, border: { type: "solid", color: "DDDAE8", pt: 1 },
@@ -268,7 +272,10 @@ s.addTable(rows, {
 });
 s.addImage({ path: "figures/scaling.png", x: 7.1, y: 1.45, w: 5.4, h: 3.2 });
 s.addText([
-  { text: "The lift over random grows with N — but the absolute success rate falls, because " +
+  { text: "N = 4 ran on AWS SV1: " + SV1_MEASURED + " of " + SV1_SHOTS + " shots = " +
+      pct(sv1, 2) + " measured, against " + pct(four.p_solved, 2) +
+      " predicted. Inside sampling error.", options: { bold: true, breakLine: true } },
+  { text: "The lift over random grows with N, but the absolute success rate falls, because " +
       "the solution fraction shrinks faster than the algorithm gains. ",
     options: { breakLine: false } },
   { text: "We report both, not only the flattering one.", options: { bold: true } }],
